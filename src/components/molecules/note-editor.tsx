@@ -70,7 +70,12 @@ export default function NoteEditor() {
               <div className='text-sm flex flex-col justify-center items-center gap-2'>
                 <span>Timothy Zorn</span>
                 <Button buttonType={selectedClient?.id === client.id ? 'selected' : 'default'} className='w-fit mb-2' onClick={() => {
-                  setSelectedClient(selectedClient?.id === client.id ? undefined : client);
+                  if (selectedClient?.id === client.id) {
+                    setSelectedClient(undefined);
+                    setSelectedAppointment(undefined);
+                  } else {
+                    setSelectedClient(client);
+                  }
                 }}>
                   Select
                 </Button>
