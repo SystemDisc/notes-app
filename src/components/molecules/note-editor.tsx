@@ -142,7 +142,7 @@ export default function NoteEditor() {
                 setMessage('');
                 setCreatingNote(false);
                 addNotification({
-                  type: 'error',
+                  type: 'success',
                   message: result.success,
                 });
               } else {
