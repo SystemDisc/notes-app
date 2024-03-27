@@ -14,7 +14,7 @@ import TextInput from '../atoms/text-input';
 
 export default function NoteList() {
   const { addNotification } = useContext(notificationContext);
-  const { notes, removeNote } = useContext(noteContext);
+  const { notes, removeNote, setSelectedNote, setCreatingNote } = useContext(noteContext);
 
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -25,7 +25,7 @@ export default function NoteList() {
         const appointment = appointments.find((appointment) => appointment.id === note.appointmentId);
         const client = clients.find((client) => client.id === appointment?.clientId);
         return (
-          <>
+          <div key={note.id}>
             {index > 0 &&
               <hr />
             }
@@ -59,21 +59,14 @@ export default function NoteList() {
                   <BsTrash />
                 </Button>
                 <Button buttonType='selected' className='!rounded w-full' onClick={async () => {
-                  try {
-                    await removeNote(note.id);
-                    addNotification({
-                      type: 'success',
-                      message: 'Note deleted successfully.',
-                    });
-                  } catch (e) {
-                    handleError(e, addNotification);
-                  }
+                  setSelectedNote(note);
+                  setCreatingNote(true);
                 }}>
                   <BsPencilSquare />
                 </Button>
               </div>
             </section>
-          </>
+          </div>
         )
       })}
     </div>

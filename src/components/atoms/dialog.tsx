@@ -20,7 +20,7 @@ export default function Dialog({
         onBackdropClick();
       }
     }
-  }, []);
+  }, [onBackdropClick]);
 
   useEffect(() => {
     if (isOpen) {
@@ -38,7 +38,7 @@ export default function Dialog({
 
       document.removeEventListener('keyup', onKeypress);
     };
-  }, [])
+  }, [onKeypress])
 
   if (isOpen) {
     return (

@@ -1,6 +1,6 @@
 'use server';
 
-import { NewNote, db } from '@/db/database';
+import { NewNote, NoteUpdate, db } from '@/db/database';
 import { decodeHTML } from 'entities';
 import { Simplify } from 'kysely';
 import striptags from 'striptags';
@@ -30,8 +30,11 @@ export const readNotes = async () => {
   return notes;
 }
 
-export const updateNote = async () => {
-
+export const updateNote = async (id: string, note: Simplify<NoteUpdate>) => {
+  await db.updateTable('Note')
+    .set(note)
+    .where('id', '=', id)
+    .execute();
 };
 
 export const deleteNote = async (id: string) => {

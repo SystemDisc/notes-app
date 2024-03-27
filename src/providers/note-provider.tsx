@@ -1,7 +1,7 @@
 'use client';
 
-import { NewNote, Note } from '@/db/database';
-import { createNote, deleteNote } from '@/utils/server-actions';
+import { NewNote, Note, NoteUpdate } from '@/db/database';
+import { createNote, deleteNote, updateNote } from '@/utils/server-actions';
 import { Simplify } from 'kysely';
 import { Dispatch, PropsWithChildren, SetStateAction, createContext, useState } from 'react';
 
@@ -10,8 +10,10 @@ export const noteContext = createContext({
   creatingNote: false,
   setCreatingNote: (() => { }) as Dispatch<SetStateAction<boolean>>,
   addNote: async (note: Simplify<NewNote>) => { },
-  setNote: async (note: Simplify<Note>) => { },
+  setNote: async (id: string, note: Simplify<NoteUpdate>) => { },
   removeNote: async (id: string) => { },
+  selectedNote: undefined as Simplify<Note> | undefined,
+  setSelectedNote: (() => { }) as Dispatch<SetStateAction<Simplify<Note> | undefined>>,
 });
 
 export default function NoteProvider({
@@ -22,6 +24,7 @@ export default function NoteProvider({
 }>) {
   const [notes, setNotes] = useState<Simplify<Note>[]>(initialNotes);
   const [creatingNote, setCreatingNote] = useState(false);
+  const [selectedNote, setSelectedNote] = useState<Simplify<Note>>();
 
   const addNote = async (note: Simplify<NewNote>) => {
     const newNote = await createNote(note);
@@ -29,7 +32,16 @@ export default function NoteProvider({
     setNotes(notesCopy);
   };
 
-  const setNote = async () => { };
+  const setNote = async (id: string, note: Simplify<NoteUpdate>) => {
+    const notesCopy = [...notes];
+    const existingNote = notesCopy.find((note) => note.id === id);
+    if (!existingNote) {
+      return;
+    }
+    await updateNote(id, note);
+    Object.assign(existingNote, note);
+    setNotes(notesCopy);
+  };
 
   const removeNote = async (id: string) => {
     await deleteNote(id);
@@ -45,7 +57,17 @@ export default function NoteProvider({
   };
 
   return (
-    <noteContext.Provider value={{ notes, addNote, creatingNote, setCreatingNote, setNote, removeNote }}>
+    <noteContext.Provider
+      value={{
+        notes,
+        addNote,
+        creatingNote,
+        setCreatingNote,
+        setNote,
+        removeNote,
+        selectedNote,
+        setSelectedNote,
+      }}>
       {children}
     </noteContext.Provider>
   );

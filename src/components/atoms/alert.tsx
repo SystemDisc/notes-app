@@ -23,7 +23,7 @@ export default function Alert({
     return () => {
       clearTimeout(timeoutRef);
     }
-  }, []);
+  }, [notification, timeoutRef, onDone]);
 
   return (
     <div className={classNames('rounded p-4 w-full max-w-2xl mx-auto', {

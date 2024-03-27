@@ -4,11 +4,9 @@ import { BsJournal } from 'react-icons/bs';
 import Button from '../atoms/button';
 import { useContext } from 'react';
 import { noteContext } from '@/providers/note-provider';
-import { notificationContext } from '@/providers/notification-provider';
 
 export default function PageHeader() {
-  const { addNotification } = useContext(notificationContext);
-  const { setCreatingNote } = useContext(noteContext);
+  const { setCreatingNote, setSelectedNote } = useContext(noteContext);
 
   return (
     <nav className='fixed z-40 bg-white dark:bg-black w-full h-16 border-b border-neutral-300 shadow-md shadow-neutral-700 dark:shadow-neutral-400'>
@@ -21,6 +19,7 @@ export default function PageHeader() {
         </div>
         <div>
           <Button onClick={async () => {
+            setSelectedNote(undefined);
             setCreatingNote(true);
           }}>
             New

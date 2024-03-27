@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import MyEditor from './editor';
 import Button from '../atoms/button';
 import { noteContext } from '@/providers/note-provider';
@@ -17,9 +17,10 @@ import Dialog from '../atoms/dialog';
 
 export default function NoteEditor() {
   const { addNotification } = useContext(notificationContext);
-  const { addNote, setCreatingNote, creatingNote } = useContext(noteContext);
+  const { addNote, setNote, setCreatingNote, creatingNote, selectedNote } = useContext(noteContext);
 
   const [message, setMessage] = useState('');
+  const [noteId, setNoteId] = useState<string>();
 
   const strippedMessage = decodeHTML(striptags(message));
 
@@ -27,6 +28,27 @@ export default function NoteEditor() {
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment>();
 
   const clientAppointments = appointments.filter((appointment) => appointment.clientId === selectedClient?.id);
+
+  useEffect(() => {
+    if (!selectedNote) {
+      setSelectedClient(undefined);
+      setSelectedAppointment(undefined);
+      setMessage('');
+      setNoteId(undefined);
+      return;
+    }
+
+    const appointment = appointments.find((appointment) => appointment.id === selectedNote.appointmentId);
+    const client = clients.find((client) => client.id === appointment?.id);
+    if (!client || !appointment) {
+      return;
+    }
+
+    setSelectedClient(client);
+    setSelectedAppointment(appointment);
+    setMessage(selectedNote.message);
+    setNoteId(selectedNote.id);
+  }, [selectedNote])
 
   if (!creatingNote) {
     return null;
@@ -93,19 +115,37 @@ export default function NoteEditor() {
               })
               return;
             }
-            try {
-              await addNote({
-                message,
-                appointmentId: selectedAppointment?.id,
-              });
-              setMessage('');
-              setCreatingNote(false);
-              addNotification({
-                type: 'success',
-                message: 'Note created successfully.',
-              });
-            } catch (e) {
-              handleError(e, addNotification);
+            if (!noteId) {
+              try {
+                await addNote({
+                  message,
+                  appointmentId: selectedAppointment?.id,
+                });
+                setMessage('');
+                setCreatingNote(false);
+                addNotification({
+                  type: 'success',
+                  message: 'Note created successfully.',
+                });
+              } catch (e) {
+                handleError(e, addNotification);
+              }
+            } else {
+              try {
+                await setNote(noteId, {
+                  message,
+                  appointmentId: selectedAppointment.id,
+                  dateUpdated: new Date(),
+                });
+                setMessage('');
+                setCreatingNote(false);
+                addNotification({
+                  type: 'success',
+                  message: 'Note created successfully.',
+                });
+              } catch (e) {
+                handleError(e, addNotification);
+              }
             }
           }}>
             Save
