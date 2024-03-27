@@ -1,10 +1,11 @@
 import Main from '@/components/atoms/main';
+import NoteList from '@/components/molecules/note-list';
 import Image from "next/image";
 
-export default function Home() {
+export default async function Page() {
   return (
     <Main>
-      Homepage
+      <NoteList />
     </Main>
   );
 }
