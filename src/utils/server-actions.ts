@@ -1,6 +1,6 @@
 'use server';
 
-import { NewNote, NoteUpdate, db } from '@/db/database';
+import { NewNote, Note, NoteUpdate, db } from '@/db/database';
 import { decodeHTML } from 'entities';
 import { Simplify } from 'kysely';
 import striptags from 'striptags';
@@ -8,37 +8,91 @@ import striptags from 'striptags';
 export const createNote = async (note: Simplify<NewNote>) => {
   const strippedMessage = decodeHTML(striptags(note.message));;
   if (strippedMessage.length < 20) {
-    throw new Error('Your message must be at least 20 characters long.');
+    return {
+      error: 'Your message must be at least 20 characters long.',
+    };
   }
   if (strippedMessage.length > 300) {
-    throw new Error('Your message must be no longer than 300 characters.');
+    return {
+      error: 'Your message must be no longer than 300 characters.',
+    };
   }
 
-  const notes = await db.insertInto('Note')
-    .values(note)
-    .returningAll()
-    .execute();
+  let notes: Simplify<Note>[] = [];
+  try {
+    notes = await db.insertInto('Note')
+      .values(note)
+      .returningAll()
+      .execute();
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        error: e.message,
+      };
+    } else {
+      throw e;
+    }
+  }
 
   return notes[0];
 };
 
 export const readNotes = async () => {
-  const notes = await db.selectFrom('Note')
-    .selectAll()
-    .execute();
+  let notes: Simplify<Note>[] = [];
+  try {
+    notes = await db.selectFrom('Note')
+      .selectAll()
+      .execute();
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        error: e.message,
+      };
+    } else {
+      throw e;
+    }
+  }
 
   return notes;
 }
 
 export const updateNote = async (id: string, note: Simplify<NoteUpdate>) => {
-  await db.updateTable('Note')
-    .set(note)
-    .where('id', '=', id)
-    .execute();
+  try {
+    await db.updateTable('Note')
+      .set(note)
+      .where('id', '=', id)
+      .execute();
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        error: e.message,
+      };
+    } else {
+      throw e;
+    }
+  }
+
+  return {
+    success: 'Note updated successfully.',
+  }
 };
 
 export const deleteNote = async (id: string) => {
-  await db.deleteFrom('Note')
-    .where('id', '=', id)
-    .execute();
+  try {
+    await db.deleteFrom('Note')
+      .where('id', '=', id)
+      .execute();
+  } catch (e) {
+    if (e instanceof Error) {
+      return {
+        error: e.message,
+      };
+    } else {
+      throw e;
+    }
+  }
+
+  return {
+    success: 'Note deleted successfully.',
+  }
 };

@@ -5,7 +5,6 @@ import { useContext, useState } from 'react';
 import Button from '../atoms/button';
 import { BsPencilSquare, BsTrash } from 'react-icons/bs';
 import { notificationContext } from '@/providers/notification-provider';
-import { handleError } from '@/utils/helpers';
 import Image from 'next/image';
 import { appointments, clients } from '@/utils/dummy-data';
 import classNames from 'classnames';
@@ -46,14 +45,17 @@ export default function NoteList() {
               />
               <div className='flex flex-col gap-2'>
                 <Button buttonType='red' className='!rounded w-full' onClick={async () => {
-                  try {
-                    await removeNote(note.id);
+                  const result = await removeNote(note.id);
+                  if ('success' in result) {
                     addNotification({
                       type: 'success',
-                      message: 'Note deleted successfully.',
+                      message: result.success,
                     });
-                  } catch (e) {
-                    handleError(e, addNotification);
+                  } else {
+                    addNotification({
+                      type: 'error',
+                      message: result.error,
+                    });
                   }
                 }}>
                   <BsTrash />

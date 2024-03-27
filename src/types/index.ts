@@ -16,3 +16,11 @@ export interface Appointment {
   startDate: Date;
   clientId: number;
 }
+
+export interface ErrorResponse {
+  error: string;
+}
+
+export interface SuccessResponse {
+  success: string;
+}

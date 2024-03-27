@@ -4,7 +4,6 @@ import { useContext, useEffect, useState } from 'react';
 import MyEditor from './editor';
 import Button from '../atoms/button';
 import { noteContext } from '@/providers/note-provider';
-import { handleError } from '@/utils/helpers';
 import { notificationContext } from '@/providers/notification-provider';
 import classNames from 'classnames';
 import striptags from 'striptags';
@@ -116,35 +115,41 @@ export default function NoteEditor() {
               return;
             }
             if (!noteId) {
-              try {
-                await addNote({
-                  message,
-                  appointmentId: selectedAppointment?.id,
+              const result = await addNote({
+                message,
+                appointmentId: selectedAppointment?.id,
+              });
+              setMessage('');
+              setCreatingNote(false);
+              if ('error' in result) {
+                addNotification({
+                  type: 'error',
+                  message: result.error,
                 });
-                setMessage('');
-                setCreatingNote(false);
+              } else {
                 addNotification({
                   type: 'success',
                   message: 'Note created successfully.',
                 });
-              } catch (e) {
-                handleError(e, addNotification);
               }
             } else {
-              try {
-                await setNote(noteId, {
-                  message,
-                  appointmentId: selectedAppointment.id,
-                  dateUpdated: new Date(),
-                });
-                setMessage('');
-                setCreatingNote(false);
+              const result = await setNote(noteId, {
+                message,
+                appointmentId: selectedAppointment.id,
+                dateUpdated: new Date(),
+              });
+              setMessage('');
+              setCreatingNote(false);
+              if ('success' in result) {
                 addNotification({
-                  type: 'success',
-                  message: 'Note created successfully.',
+                  type: 'error',
+                  message: result.success,
                 });
-              } catch (e) {
-                handleError(e, addNotification);
+              } else {
+                addNotification({
+                  type: 'error',
+                  message: result.error,
+                });
               }
             }
           }}>
