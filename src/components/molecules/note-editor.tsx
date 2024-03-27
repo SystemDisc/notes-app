@@ -103,7 +103,7 @@ export default function NoteEditor() {
         <div className='flex justify-between'>
           <div>
             <span className={classNames({
-              'text-red-500 font-bold': strippedMessage.length < 20,
+              'text-red-500 font-bold': strippedMessage.length < 20 || strippedMessage.length > 300,
             })}>{strippedMessage.length}</span> / 300
           </div>
           <Button onClick={async () => {
