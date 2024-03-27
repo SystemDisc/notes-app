@@ -138,9 +138,9 @@ export default function NoteEditor() {
                 appointmentId: selectedAppointment.id,
                 dateUpdated: new Date(),
               });
-              setMessage('');
-              setCreatingNote(false);
               if ('success' in result) {
+                setMessage('');
+                setCreatingNote(false);
                 addNotification({
                   type: 'error',
                   message: result.success,
