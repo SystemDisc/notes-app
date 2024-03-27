@@ -1,25 +1,81 @@
 'use client';
 
 import { noteContext } from '@/providers/note-provider';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import Button from '../atoms/button';
-import { BsTrash } from 'react-icons/bs';
+import { BsPencilSquare, BsTrash } from 'react-icons/bs';
+import { notificationContext } from '@/providers/notification-provider';
+import { handleError } from '@/utils/helpers';
+import Image from 'next/image';
+import { appointments, clients } from '@/utils/dummy-data';
+import classNames from 'classnames';
+import moment from 'moment';
+import TextInput from '../atoms/text-input';
 
 export default function NoteList() {
-  const { notes } = useContext(noteContext);
+  const { addNotification } = useContext(notificationContext);
+  const { notes, removeNote } = useContext(noteContext);
+
+  const [searchTerm, setSearchTerm] = useState('');
 
   return (
     <div className='flex flex-col gap-4'>
-      {notes.map((note) => (
-        <section key={note.id} className='w-full flex gap-4'>
-          <div className='w-[calc(100%_-_5rem)] p-4 overflow-hidden shadow-md shadow-neutral-900 border border-neutral-300 dark:border-white rounded'>
-            {note.message}
-          </div>
-          <Button buttonType='red' className='w-16 h-16 !rounded'>
-            <BsTrash />
-          </Button>
-        </section>
-      ))}
+      <TextInput id='searchTerm' label='Search Term' value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+      {notes.filter((note) => note.message.toLowerCase().includes(searchTerm.toLowerCase())).map((note, index) => {
+        const appointment = appointments.find((appointment) => appointment.id === note.appointmentId);
+        const client = clients.find((client) => client.id === appointment?.clientId);
+        return (
+          <>
+            {index > 0 &&
+              <hr />
+            }
+            <section key={note.id} className='w-full grid grid-cols-12 gap-4'>
+              {client &&
+                <div className='col-span-2 grid grid-cols-1'>
+                  <Image className='border border-neutral-300' src={client.image} width={512} height={512} alt={client.name} />
+                  <div className='text-center'>{client.name}</div>
+                  <div className='text-center text-xs'>{moment(appointment?.startDate).format('MM/DD/YYYY @ h:mm:ss')}</div>
+                </div>
+              }
+              <div
+                className={classNames('p-4 overflow-hidden shadow-md shadow-neutral-900 border border-neutral-300 dark:border-white rounded', {
+                  'col-span-9': client,
+                  'col-span-11': !client,
+                })}
+                dangerouslySetInnerHTML={{ __html: note.message }}
+              />
+              <div className='flex flex-col gap-2'>
+                <Button buttonType='red' className='!rounded w-full' onClick={async () => {
+                  try {
+                    await removeNote(note.id);
+                    addNotification({
+                      type: 'success',
+                      message: 'Note deleted successfully.',
+                    });
+                  } catch (e) {
+                    handleError(e, addNotification);
+                  }
+                }}>
+                  <BsTrash />
+                </Button>
+                <Button buttonType='selected' className='!rounded w-full' onClick={async () => {
+                  try {
+                    await removeNote(note.id);
+                    addNotification({
+                      type: 'success',
+                      message: 'Note deleted successfully.',
+                    });
+                  } catch (e) {
+                    handleError(e, addNotification);
+                  }
+                }}>
+                  <BsPencilSquare />
+                </Button>
+              </div>
+            </section>
+          </>
+        )
+      })}
     </div>
   )
 }

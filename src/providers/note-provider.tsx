@@ -1,20 +1,17 @@
 'use client';
 
-import { Note } from '@/db/database';
-import { createNote } from '@/utils/server-actions';
+import { NewNote, Note } from '@/db/database';
+import { createNote, deleteNote } from '@/utils/server-actions';
 import { Simplify } from 'kysely';
 import { Dispatch, PropsWithChildren, SetStateAction, createContext, useState } from 'react';
 
-export const noteContext = createContext<{
-  notes: Simplify<Note>[];
-  creatingNote: boolean;
-  setCreatingNote: Dispatch<SetStateAction<boolean>>;
-  addNote: (message: string) => Promise<void>;
-}>({
-  notes: [],
+export const noteContext = createContext({
+  notes: [] as Simplify<Note>[],
   creatingNote: false,
-  setCreatingNote: () => { },
-  addNote: async () => { },
+  setCreatingNote: (() => { }) as Dispatch<SetStateAction<boolean>>,
+  addNote: async (note: Simplify<NewNote>) => { },
+  setNote: async (note: Simplify<Note>) => { },
+  removeNote: async (id: string) => { },
 });
 
 export default function NoteProvider({
@@ -26,14 +23,29 @@ export default function NoteProvider({
   const [notes, setNotes] = useState<Simplify<Note>[]>(initialNotes);
   const [creatingNote, setCreatingNote] = useState(false);
 
-  const addNote = async (message: string) => {
-    const note = await createNote(message);
-    const notesCopy = [...notes, note];
+  const addNote = async (note: Simplify<NewNote>) => {
+    const newNote = await createNote(note);
+    const notesCopy = [...notes, newNote];
+    setNotes(notesCopy);
+  };
+
+  const setNote = async () => { };
+
+  const removeNote = async (id: string) => {
+    await deleteNote(id);
+    const notesCopy = [...notes];
+    const index = notesCopy.findIndex((note) => note.id === id);
+
+    if (index < 0) {
+      return;
+    }
+
+    notesCopy.splice(index, 1);
     setNotes(notesCopy);
   };
 
   return (
-    <noteContext.Provider value={{ notes, addNote, creatingNote, setCreatingNote }}>
+    <noteContext.Provider value={{ notes, addNote, creatingNote, setCreatingNote, setNote, removeNote }}>
       {children}
     </noteContext.Provider>
   );

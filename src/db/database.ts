@@ -7,6 +7,7 @@ interface Database {
 
 export interface NoteTable {
   id: GeneratedAlways<string>;
+  appointmentId: number;
   message: string;
   dateCreated?: Date;
   dateUpdated: Date | null;

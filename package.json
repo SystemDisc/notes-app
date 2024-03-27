@@ -10,21 +10,29 @@
     "migrate": "tsx migrate.ts"
   },
   "dependencies": {
+    "@ckeditor/ckeditor5-build-classic": "^41.2.1",
     "@ckeditor/ckeditor5-react": "^6.2.0",
     "@vercel/postgres-kysely": "^0.7.2",
     "classnames": "^2.5.1",
+    "entities": "^4.5.0",
     "kysely": "^0.27.3",
+    "moment": "^2.30.1",
     "next": "14.1.4",
     "pg": "^8.11.3",
     "react": "^18",
     "react-dom": "^18",
-    "react-icons": "^5.0.1"
+    "react-icons": "^5.0.1",
+    "string-strip-html": "^13.4.6",
+    "strip": "^3.0.0",
+    "striptags": "^3.2.0",
+    "uuid": "^9.0.1"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/pg": "^8.11.4",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/uuid": "^9.0.8",
     "autoprefixer": "^10.0.1",
     "dotenv-flow": "^4.1.0",
     "eslint": "^8",
