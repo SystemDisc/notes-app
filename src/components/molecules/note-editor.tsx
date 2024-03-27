@@ -42,7 +42,7 @@ export default function NoteEditor() {
         </h2>
         <div className='grid grid-cols-4'>
           {clients.map((client) => (
-            <div className={classNames('grid grid-cols-1 gap-2 border border-neutral-300', {
+            <div key={client.id} className={classNames('grid grid-cols-1 gap-2 border border-neutral-300', {
               'outline outline-4 outline-blue-500 outline-offset-4': selectedClient?.id === client.id,
             })}>
               <Image src={client.image} width={512} height={512} alt={client.name} />
@@ -64,7 +64,7 @@ export default function NoteEditor() {
             </h2>
             <div className='flex gap-4'>
               {clientAppointments.map((appointment) => (
-                <Button buttonType={selectedAppointment?.id === appointment.id ? 'selected' : 'default'} onClick={() => {
+                <Button key={appointment.id} buttonType={selectedAppointment?.id === appointment.id ? 'selected' : 'default'} onClick={() => {
                   setSelectedAppointment(selectedAppointment?.id === appointment.id ? undefined : appointment);
                 }}>
                   {moment(appointment.startDate).format('MM/DD/YYYY @ h:mm:ss a')}
