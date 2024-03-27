@@ -18,11 +18,12 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const result = await readNotes();
   return (
     <html lang="en">
       <body className={inter.className}>
         <NotificationProvider>
-          <NoteProvider notes={await readNotes()}>
+          <NoteProvider notes={'error' in result ? [] : result}>
             <PageHeader />
             <div className='relative top-16'>
               {children}
