@@ -20,7 +20,7 @@ function NotificationProvider({ children }: PropsWithChildren<{}>) {
       if (!notification.uuid) {
         notification.uuid = v4();
       }
-      newNotifications.push(notification);
+      newNotifications.unshift(notification);
       return newNotifications;
     });
   };

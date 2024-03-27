@@ -119,14 +119,14 @@ export default function NoteEditor() {
                 message,
                 appointmentId: selectedAppointment?.id,
               });
-              setMessage('');
-              setCreatingNote(false);
               if ('error' in result) {
                 addNotification({
                   type: 'error',
                   message: result.error,
                 });
               } else {
+                setMessage('');
+                setCreatingNote(false);
                 addNotification({
                   type: 'success',
                   message: 'Note created successfully.',
