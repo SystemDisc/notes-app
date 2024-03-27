@@ -24,7 +24,7 @@ export default function NoteList() {
         const appointment = appointments.find((appointment) => appointment.id === note.appointmentId);
         const client = clients.find((client) => client.id === appointment?.clientId);
         return (
-          <div key={note.id}>
+          <div className='flex flex-col gap-4' key={note.id}>
             {index > 0 &&
               <hr />
             }
